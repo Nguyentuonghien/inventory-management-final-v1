@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+    <context:component-scan base-package="inventory"></context:component-scan>
+
+    <!-- kích hoạt các annotation cần thiết: @Controller, @Validate, ... -->
+    <mvc:annotation-driven></mvc:annotation-driven>
+    
+    <!-- khai báo các file tĩnh(css, js) -->
+    <mvc:resources location="/static/" mapping="/resources/**"></mvc:resources>
+    
+    <!-- Define Spring MVC view resolver Spring se tim den cac trang JSP -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="1" />
+		<property name="prefix">
+			<value>/WEB-INF/views/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+	</bean>
+    
+    <bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+		    <list>
+			    <value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+    <!-- định nghĩa 1 JDBC DataSource (jdbc.properties)-->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+    
+    <!-- Session Factory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties" value="classpath:hibernate.properties"></property>
+		<!-- khai bao cac file mapping resources -->
+		<property name="mappingResources">
+		    <list>
+		        <value>inventory/model/mapping/Auth.hbm.xml</value>
+				<value>inventory/model/mapping/Category.hbm.xml</value>
+				<value>inventory/model/mapping/History.hbm.xml</value>
+				<value>inventory/model/mapping/Invoice.hbm.xml</value>
+				<value>inventory/model/mapping/Menu.hbm.xml</value>
+				<value>inventory/model/mapping/ProductInfo.hbm.xml</value>
+				<value>inventory/model/mapping/ProductInStock.hbm.xml</value>
+				<value>inventory/model/mapping/Role.hbm.xml</value>
+				<value>inventory/model/mapping/UserRole.hbm.xml</value>
+				<value>inventory/model/mapping/Users.hbm.xml</value>
+		    </list>
+		</property>
+	</bean>
+    
+    <!-- trao quyền quản lý các transaction cho Spring(tự động đóng mở các trasaction or rollback khi có lỗi) -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+    
+    <!-- khai báo tiles -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="order" value="0"></property>
+		<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView"></property>
+	</bean>
+
+	<bean id="tilesConfigure" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/tiles.xml</value>
+			</list>
+		</property>
+	</bean>
+    
+    <!-- khai báo file: message.properties -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="/message/message"></property>
+	</bean>
+    
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
