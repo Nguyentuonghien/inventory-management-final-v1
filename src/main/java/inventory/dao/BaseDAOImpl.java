@@ -16,11 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = Exception.class)
 public class BaseDAOImpl<E> implements BaseDAO<E>{
 
-	public static Logger log = Logger.getLogger(BaseDAOImpl.class);
+	private static Logger log = Logger.getLogger(BaseDAOImpl.class);
 	
 	/**
-	 * tự động liên kết với bean "sessionFactory" 
-	 * ở file : spring-mvc-servlet.xml
+	 * tự động liên kết với bean "sessionFactory" ở file : spring-mvc-servlet.xml
 	 */
 	@Autowired
 	SessionFactory sessionFactory;
