@@ -18,8 +18,7 @@ public class UserService {
 	private UserDAO<Users> userDAO;
 	
 	public List<Users> findByProperty(String property, Object value) {	
-		log.info("Find user by property start: ");
-		
+		log.info("Find user by property start: ");	
 		return userDAO.findByProperty(property, value);
 	}
 	

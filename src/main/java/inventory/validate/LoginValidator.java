@@ -24,7 +24,7 @@ public class LoginValidator implements Validator{
 		return clazz == Users.class;
 	}
 
-	// target: là các thông tin được gửi từ form(login) lên bao gồm username và password
+	// target: là đối tượng user bao gồm các thông tin được gửi từ form(login) lên bao gồm username và password của user
 	@Override
 	public void validate(Object target, Errors errors) {
 		Users user = (Users) target;
