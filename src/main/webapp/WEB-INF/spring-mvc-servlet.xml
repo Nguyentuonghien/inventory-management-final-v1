@@ -97,6 +97,23 @@
 		<property name="basename" value="/message/message"></property>
 	</bean>
     
+    <!-- khai báo bộ lọc cho hệ thống -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+        
+            <!-- tất cả request đều đi qua -->
+            <mvc:mapping path="/**"/>
+            
+            <!-- những url sẽ k cần kiểm tra: /login & /processLogin chưa có thông tin user, resources thì chứa các file tĩnh css, javascript -->
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/processLogin"/>
+            <mvc:exclude-mapping path="/resources/**"/>
+            
+            <bean class="inventory.security.FilterSystem"></bean>
+            
+        </mvc:interceptor>
+    </mvc:interceptors>
+    
 </beans>
 
 
