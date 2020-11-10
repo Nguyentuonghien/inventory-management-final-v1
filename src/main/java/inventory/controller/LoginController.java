@@ -48,7 +48,8 @@ public class LoginController {
 	}
 
 	@GetMapping("/login")
-	public String login(Model model) { // model giúp ta vận chuyển data từ backend sang tầng view(trang jsp)
+	public String login(Model model) { 
+		// khi login ta sẽ trả về 1 đối tượng Users rỗng để cho người dùng điền các thông tin vào form
 		model.addAttribute("loginForm", new Users());
 		return "login/login";
 	}
@@ -73,6 +74,7 @@ public class LoginController {
 	// HttpSession: khi user đăng nhập thành công --> save thông tin của user vào trong session(session sẽ chứa thông tin của user đó)
 	@PostMapping("/processLogin")
 	public String processLogin(Model model, @ModelAttribute("loginForm") @Validated Users users, BindingResult bindingResult, HttpSession session) {
+		// khi ta nhập username và password trên form mà có lỗi
 		if (bindingResult.hasErrors()) {
 			return "login/login";
 		}
