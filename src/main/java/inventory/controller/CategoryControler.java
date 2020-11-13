@@ -1,9 +1,12 @@
 package inventory.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,6 +40,10 @@ public class CategoryControler {
 	@InitBinder
 	private void initBinder(WebDataBinder binder) {
 		if(binder.getTarget() == null) return;
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+		
 		// trong class CategoryValidator ta chỉ support Class validate là  Category(các class khác thì không) 
 		// và binder sẽ kiểm tra nếu đúng là class Category --> sẽ setValidator cho categoryValidator
 		if(binder.getTarget().getClass() == Category.class) {
@@ -91,22 +98,30 @@ public class CategoryControler {
 	}
 	
 	@PostMapping("/category/save")
-	public String saveCategory(@ModelAttribute("modelForm") @Validated Category category, Model model, BindingResult result) {
-		// validate lỗi (khi ta nhập code,name,description trên form mà có lỗi)
+	public String saveCategory(Model model, @ModelAttribute("modelForm") @Validated Category category, BindingResult result) {
+		// 2 màn hình add và edit khi validate lỗi (khi ta nhập code,name,description trên form mà có lỗi)
 		if(result.hasErrors()) {
+			if(category.getId() != null) {
+				model.addAttribute("titlePage", "Edit Category");
+			}else {
+				model.addAttribute("titlePage", "Add Category");
+			}
+			model.addAttribute("modelForm", category);
+			model.addAttribute("viewOnly", false);
 			return "category-action";
 		}
+		
 		// vì màn hình add và edit dùng chung 1 form ==> để phân biệt add và edit: nếu là add thì không có id còn
-		// nếu là edit ==> có id đi kèm(vì nó record đó đã tồn tại trong DB) và id đó khác 0 và khác null 
+		// nếu là edit ==> có id đi kèm(vì record đó đã tồn tại trong DB) và id đó khác 0 và khác null 
 		// (Vd: id trong DB có giá trị = 1 nhưng nếu ta nhập vào id=10 ==> trả về null vì k tồn tại id=10 trong DB)
-		if(category.getId() != 0 && category.getId() != null) {
+		if(category.getId() != null && category.getId() != 0) {
 			productService.updateCategory(category);
 			model.addAttribute("message", "Update success!!!");
-		} else {
+		}else {
 			productService.saveCategory(category);
 			model.addAttribute("message", "Insert success!!!");
 		}
-		return "category-list";
+		return "redirect:/category/list";
 	}
 	
 	@GetMapping("/category/delete/{id}")
