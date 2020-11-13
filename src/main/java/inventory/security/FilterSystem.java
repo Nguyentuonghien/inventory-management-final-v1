@@ -26,10 +26,10 @@ public class FilterSystem implements HandlerInterceptor{
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		logger.info("[preHandle][" + request + "]" + "[" + request.getMethod() + "]" + request.getRequestURI());
+		logger.info("Request URI = "+request.getRequestURI());
 		
 		// để kiểm tra xem user đã login chưa? ta sẽ kiểm tra trong session(vì nếu đã login thì thông tin của user sẽ được lưu trong session)
-		Users users = (Users) request.getAttribute(Constant.USER_INFO);
+		Users users = (Users) request.getSession().getAttribute(Constant.USER_INFO);
 		
 		// nếu k tìm thấy(không có trong session) --> trả về trang login với đường dẫn: http://localhost:8080/inventory_management/login
 		if(users == null) {
@@ -67,8 +67,7 @@ public class FilterSystem implements HandlerInterceptor{
 			if(url.contains(menu.getUrl())) {            
 				return auth.getPermission() == 1;
 			}
-		}
-		
+		}	
 		return false;
 	}
 	
