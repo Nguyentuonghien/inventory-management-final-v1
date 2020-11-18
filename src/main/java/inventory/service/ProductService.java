@@ -1,11 +1,14 @@
 package inventory.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import inventory.dao.CategoryDAO;
 import inventory.model.Category;
@@ -18,7 +21,7 @@ public class ProductService {
 	@Autowired
 	private CategoryDAO<Category> categoryDAO;
 	
-	public void saveCategory(Category category) {
+	public void saveCategory(Category category) throws Exception{
 		log.info("Insert category "+category.toString());
 		category.setActiveFlag(1);
 		category.setCreateDate(new Date());
@@ -26,13 +29,13 @@ public class ProductService {
 		categoryDAO.save(category);
 	}
 	
-	public void updateCategory(Category category) {
+	public void updateCategory(Category category) throws Exception{
 		log.info("Update category "+category.toString());
 		category.setUpdateDate(new Date());
 		categoryDAO.update(category);
 	}
 	
-	public void deleteCategory(Category category) {
+	public void deleteCategory(Category category) throws Exception{
 		log.info("Delete category "+category.toString());
 		// ta sẽ k xóa record mà chỉ cập nhật trạng thái cho nó(0 là không tồn tại)
 		category.setActiveFlag(0);
@@ -47,9 +50,31 @@ public class ProductService {
 		return categories;
 	}
 	
-	public List<Category> getAllCategory() {
+	public List<Category> getAllCategory(Category category) {
 		log.info("Show all category");
-		return categoryDAO.findAll();
+		
+		StringBuilder queryStr = new StringBuilder();		
+		// mapParams sẽ lưu các param mà ta truyền vào(giả sử ta truyền vào param: id=1,name=Apple,code=ProXsmax) và phía DAO sẽ set giá trị cho các params này
+		Map<String, Object> mapParams = new HashMap<>();
+		if(category != null) {
+			if(category.getId() != null && category.getId() != 0) {
+				// nối với câu lệnh của hàm findAll() bên BaseDAOImpl: from category as model where model.activeFlag=1 and model.id=:id
+				queryStr.append("and model.id=:id");     
+				mapParams.put("id", category.getId());
+			}
+			if(category.getCode() != null && !StringUtils.isEmpty(category.getCode())) {
+				// nối với câu lệnh của hàm findAll() bên BaseDAOImpl: from category as model where model.activeFlag=1 and model.id=:id
+				queryStr.append("and model.code=:code");     
+				mapParams.put("code", category.getCode());
+			}
+			if(category.getName() != null && !StringUtils.isEmpty(category.getName())) {
+				// nối với câu lệnh của hàm findAll() bên BaseDAOImpl: from category as model where model.activeFlag=1 and model.id=:id
+				queryStr.append("and model.name=:name");     
+				mapParams.put("name", category.getName());
+			}
+		}
+		
+		return categoryDAO.findAll(queryStr.toString(), mapParams);
 	}
 	
 	public Category findById(int id) {
