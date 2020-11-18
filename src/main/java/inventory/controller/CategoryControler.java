@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -17,9 +19,12 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import inventory.model.Category;
 import inventory.service.ProductService;
+import inventory.util.Constant;
 import inventory.validate.CategoryValidator;
 
 /** @InitBinder: nếu ta muốn tùy chỉnh request được gửi đến controller, nó được định nghĩa trong controller, giúp kiểm soát và định dạng mọi request đến với nó. 
@@ -51,9 +56,21 @@ public class CategoryControler {
 		}
 	}
 	
-	@GetMapping("/category/list")
-	public String showCategoryList(Model model) {
-		List<Category> categories = productService.getAllCategory();
+	// @ModelAttribute: khi form search submit lên --> mọi thông tin từ "searchForm" này sẽ được gán vào Category
+	@RequestMapping(value = "/category/list")
+	public String showCategoryList(Model model, HttpSession session, @ModelAttribute("searchForm") Category category) {
+		List<Category> categories = productService.getAllCategory(category);
+		
+		// nếu có thông báo(success hoặc error) được lưu trong session thì ta sẽ lấy nó ra và gửi nó qua "category-list" 
+		// và đồng thời xóa nó luôn trong session
+		if(session.getAttribute(Constant.MSG_SUCCESS) != null) {
+			model.addAttribute(Constant.MSG_SUCCESS, session.getAttribute(Constant.MSG_SUCCESS));
+			session.removeAttribute(Constant.MSG_SUCCESS);
+		}
+		if(session.getAttribute(Constant.MSG_ERROR) != null) {
+			model.addAttribute(Constant.MSG_ERROR, session.getAttribute(Constant.MSG_ERROR));
+			session.removeAttribute(Constant.MSG_ERROR);
+		}
 		model.addAttribute("categories", categories);
 		return "category-list";
 	}
@@ -98,7 +115,7 @@ public class CategoryControler {
 	}
 	
 	@PostMapping("/category/save")
-	public String saveCategory(Model model, @ModelAttribute("modelForm") @Validated Category category, BindingResult result) {
+	public String saveCategory(Model model, @ModelAttribute("modelForm") @Validated Category category, BindingResult result, HttpSession session) {
 		// 2 màn hình add và edit khi validate lỗi (khi ta nhập code,name,description trên form mà có lỗi)
 		if(result.hasErrors()) {
 			if(category.getId() != null) {
@@ -115,21 +132,39 @@ public class CategoryControler {
 		// nếu là edit ==> có id đi kèm(vì record đó đã tồn tại trong DB) và id đó khác 0 và khác null 
 		// (Vd: id trong DB có giá trị = 1 nhưng nếu ta nhập vào id=10 ==> trả về null vì k tồn tại id=10 trong DB)
 		if(category.getId() != null && category.getId() != 0) {
-			productService.updateCategory(category);
-			model.addAttribute("message", "Update success!!!");
+			try {
+				productService.updateCategory(category);
+				session.setAttribute(Constant.MSG_SUCCESS, "Update success!!!");     // lưu thông báo thành công trong session(không phải model)
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.info(e.getMessage());
+				session.setAttribute(Constant.MSG_ERROR, "Update has error!!!");     // lưu thông báo lỗi trong session
+			}
 		}else {
-			productService.saveCategory(category);
-			model.addAttribute("message", "Insert success!!!");
+			try {
+				productService.saveCategory(category);
+				session.setAttribute(Constant.MSG_SUCCESS, "Insert success!!!"); 
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.info(e.getMessage());
+				session.setAttribute(Constant.MSG_ERROR, "Insert has error!!!"); 
+			}
 		}
 		return "redirect:/category/list";
 	}
 	
 	@GetMapping("/category/delete/{id}")
-	public String deleteCategory(Model model, @PathVariable("id") int id) {
+	public String deleteCategory(Model model, @PathVariable("id") int id, HttpSession session) {
 		log.info("Delete category by id: "+id);
 		Category category = productService.findById(id);
 		if(category != null) {
-			productService.deleteCategory(category);
+			try {
+				productService.deleteCategory(category);
+				session.setAttribute(Constant.MSG_SUCCESS, "Delete success!!!"); 
+			} catch (Exception e) {
+				e.printStackTrace();
+				session.setAttribute(Constant.MSG_ERROR, "Delete has error!!!"); 
+			}
 		}
 		return "redirect:/category/list";
 	}

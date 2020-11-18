@@ -2,6 +2,7 @@ package inventory.dao;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,16 +26,26 @@ public class BaseDAOImpl<E> implements BaseDAO<E>{
 	SessionFactory sessionFactory;
 	
 	@Override
-	public List<E> findAll() {
+	public List<E> findAll(String queryStr, Map<String, Object> mapParams) {
 		log.info("Find all record from database:");
 		
 		StringBuilder queryString = new StringBuilder("");
-		// câu query: from category as model where model.activeFlag=1
-		// lấy ra tất cả các bản ghi từ category có activeFlag = 1
+		// câu query: from category as model where model.activeFlag=1 (lấy ra tất cả các bản ghi từ bảng category có activeFlag = 1)
 		queryString.append(" from ").append(getGenericName()).append(" as model where model.activeFlag=1");
 		
+		// nếu queryStr khác null và không rỗng --> nối với câu query bên phía service: from category as model where model.activeFlag=1 and model.id=:id
+		if(queryStr != null && !queryStr.isEmpty()) {
+			queryString.append(queryStr);
+		}
+		// khi params khác null và k rỗng --> ta sẽ set các params được truyền từ service vào trong câu query
+		Query<E> query = sessionFactory.getCurrentSession().createQuery(queryString.toString());
+		if(mapParams != null && !mapParams.isEmpty()) {
+			for(String key : mapParams.keySet()) {
+				query.setParameter(key, mapParams.get(key));
+			}
+		}
 		log.info("Query find all ====> "+queryString.toString());
-		return sessionFactory.getCurrentSession().createQuery(queryString.toString()).getResultList();
+		return query.list();
 	}
 
 	@Override
