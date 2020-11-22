@@ -113,7 +113,8 @@
     <script src="<c:url value="/resources/vendors/pnotify/dist/pnotify.buttons.js"/>"></script>
     <script src="<c:url value="/resources/vendors/pnotify/dist/pnotify.nonblock.js"/>"></script>
 	
-	<script src="<c:url value="/resources/build/js/custom.min.js"/>"></script>
+	<!-- Custom Theme Scripts -->
+	<script src="<c:url value="/resources/build/js/custom.js"/>"></script>
 	
 </body>
 </html>
