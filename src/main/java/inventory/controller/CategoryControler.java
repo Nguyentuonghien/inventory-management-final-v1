@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import inventory.model.Category;
+import inventory.model.Paging;
 import inventory.service.ProductService;
 import inventory.util.Constant;
 import inventory.validate.CategoryValidator;
@@ -56,10 +56,18 @@ public class CategoryControler {
 		}
 	}
 	
+	// với những url này thì mặc định ta sẽ chuyên hướng về trang đầu tiên(page=1)
+    @RequestMapping(value= {"/category/list","/category/list/"})	
+	public String redirect() {
+		return "redirect:/category/list/1";
+	}
+	
 	// @ModelAttribute: khi form search submit lên --> mọi thông tin từ "searchForm" này sẽ được gán vào Category
-	@RequestMapping(value = "/category/list")
-	public String showCategoryList(Model model, HttpSession session, @ModelAttribute("searchForm") Category category) {
-		List<Category> categories = productService.getAllCategory(category);
+	@RequestMapping(value = "/category/list/{page}")      // page: trang hiện tại, từ page này ta sẽ tính ra  offset tương ứng
+	public String showCategoryList(Model model, HttpSession session, @ModelAttribute("searchForm") Category category, @PathVariable(value = "page") int page) {
+		Paging paging = new Paging(1);
+		paging.setIndexPage(page);
+		List<Category> categories = productService.getAllCategory(category, paging);
 		
 		// nếu có thông báo(success hoặc error) được lưu trong session thì ta sẽ lấy nó ra và gửi nó qua "category-list" 
 		// và đồng thời xóa nó luôn trong session
@@ -72,6 +80,7 @@ public class CategoryControler {
 			session.removeAttribute(Constant.MSG_ERROR);
 		}
 		model.addAttribute("categories", categories);
+		model.addAttribute("pageInfo", paging);
 		return "category-list";
 	}
 	

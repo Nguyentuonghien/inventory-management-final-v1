@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import inventory.model.Paging;
+
 public interface BaseDAO<E> {
 	
-	public List<E> findAll(String queryStr, Map<String, Object> mapParams);
+	public List<E> findAll(String queryStr, Map<String, Object> mapParams, Paging page);
 	
 	public E findById(Class<E> e, Serializable id);
 	

@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import inventory.dao.CategoryDAO;
 import inventory.model.Category;
+import inventory.model.Paging;
 
 @Service
 public class ProductService {
@@ -49,8 +50,9 @@ public class ProductService {
 		List<Category> categories = categoryDAO.findByProperty(property, value);
 		return categories;
 	}
-	
-	public List<Category> getAllCategory(Category category) {
+		
+	// search và phân trang
+	public List<Category> getAllCategory(Category category, Paging page) {
 		log.info("Show all category");
 		
 		StringBuilder queryStr = new StringBuilder();		
@@ -59,22 +61,22 @@ public class ProductService {
 		if(category != null) {
 			if(category.getId() != null && category.getId() != 0) {
 				// nối với câu lệnh của hàm findAll() bên BaseDAOImpl: from category as model where model.activeFlag=1 and model.id=:id
-				queryStr.append("and model.id=:id");     
+				queryStr.append(" and model.id=:id");     
 				mapParams.put("id", category.getId());
 			}
 			if(category.getCode() != null && !StringUtils.isEmpty(category.getCode())) {
 				// nối với câu lệnh của hàm findAll() bên BaseDAOImpl: from category as model where model.activeFlag=1 and model.id=:id
-				queryStr.append("and model.code=:code");     
+				queryStr.append(" and model.code=:code");     
 				mapParams.put("code", category.getCode());
 			}
 			if(category.getName() != null && !StringUtils.isEmpty(category.getName())) {
 				// nối với câu lệnh của hàm findAll() bên BaseDAOImpl: from category as model where model.activeFlag=1 and model.id=:id
-				queryStr.append("and model.name=:name");     
-				mapParams.put("name", category.getName());
+				queryStr.append(" and model.name like :name");     
+				mapParams.put("name", "%"+category.getName()+"%");
 			}
 		}
 		
-		return categoryDAO.findAll(queryStr.toString(), mapParams);
+		return categoryDAO.findAll(queryStr.toString(), mapParams, page);
 	}
 	
 	public Category findById(int id) {
