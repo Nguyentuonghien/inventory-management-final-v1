@@ -24,15 +24,14 @@ public class CategoryValidator implements Validator {
 
 	@Override
 	public void validate(Object target, Errors errors) {
-		// target: là đối tượng category, bao gồm các thông tin được gửi từ form lên bao
-		// gồm các trường ta sẽ validate: name , code , description
+		// target: là đối tượng category, bao gồm các thông tin được gửi từ form lên bao gồm các trường ta sẽ validate: name , code , description
 		Category category = (Category) target;
 
 		// 3 trường ta validate không được rỗng trên form
 		ValidationUtils.rejectIfEmpty(errors, "code", "message.required");
 		ValidationUtils.rejectIfEmpty(errors, "name", "message.required");
 		ValidationUtils.rejectIfEmpty(errors, "description", "message.required");
-
+		
 		// code không được trùng nhau:
 		if (category.getCode() != null) {
 			List<Category> results = productService.findCategoryByProperty("code", category.getCode());
