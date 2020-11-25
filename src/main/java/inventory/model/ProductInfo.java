@@ -23,10 +23,10 @@ public class ProductInfo implements java.io.Serializable {
 	private Date updateDate;
 	private Set<History> histories = new HashSet<History>(0);
 	private Set<ProductInStock> productInStocks = new HashSet<ProductInStock>(0);
-	private Set<Invoice> invoices = new HashSet<Invoice>(0);
+	private Set<Invoice> invoices = new HashSet<Invoice>(0); 
 
 	// MultipartFile là đối tượng file được upload lên: khi ta upload file từ phía jsp lên Spring sẽ gắn nó vào 1 đối tượng là MultipartFile
-	// ==> dựa vào MultipartFile ta sẽ lấy được filename và từ file name ta sẽ gán vào một url nào đó để lưu vào DB
+	// ==> dựa vào MultipartFile ta sẽ lấy được filename và từ filename ta sẽ gán vào một url nào đó để lưu vào DB
 	private MultipartFile multipartFile;  
 	
 	private Integer cateId;
