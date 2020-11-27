@@ -25,12 +25,17 @@ public class ProductInfoValidator implements Validator{
 
 	@Override
 	public void validate(Object target, Errors errors) {
+		// target: là đối tượng productInfo bao gồm các thông tin được gửi từ form(login) lên
 		ProductInfo productInfo = (ProductInfo) target;
 		
 		ValidationUtils.rejectIfEmpty(errors, "code", "message.required");
 		ValidationUtils.rejectIfEmpty(errors, "name", "message.required");
 		ValidationUtils.rejectIfEmpty(errors, "description", "message.required");
-		ValidationUtils.rejectIfEmpty(errors, "multipartFile", "message.required");
+		
+		// chỉ báo lỗi khi add, update thì k cần 
+		if(productInfo.getId() != null) {
+			 ValidationUtils.rejectIfEmpty(errors, "multipartFile", "message.required");
+		}
 		
 		// code không được trùng nhau:
 		if (productInfo.getCode() != null) {
@@ -48,10 +53,11 @@ public class ProductInfoValidator implements Validator{
 				}
 			}
 		}
+		// kiểm tra các đường dẫn: tên file không rỗng
 		// ta chỉ support các file có đuôi là "jpg" và "png"(kayn.jpg, kayn.png), còn các file khác ta sẽ k support
-		if(productInfo.getMultipartFile() != null) {
+		if(!productInfo.getMultipartFile().getOriginalFilename().isEmpty()) {
 			String extension = FilenameUtils.getExtension(productInfo.getMultipartFile().getOriginalFilename());
-			if(!extension.equals("jpg") || !extension.equals("png")) {
+			if(!extension.equals("jpg") && !extension.equals("png")) {
 				errors.rejectValue("multipartFile", "message.file.extension.error");
 			}
 		}

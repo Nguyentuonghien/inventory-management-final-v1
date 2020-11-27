@@ -33,7 +33,7 @@ public class ConfigLoader {
 	
 	// hàm đọc các file properties(ở đây là config.properties):
 	public String getValue(String key) {
-		if(properties.contains(key)) {
+		if(properties.containsKey(key)) {
 			return properties.getProperty(key);
 		}
 		return null;

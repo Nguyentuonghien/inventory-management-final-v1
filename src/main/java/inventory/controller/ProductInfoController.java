@@ -87,12 +87,12 @@ public class ProductInfoController {
 		return "productInfo-list";
 	}
 	
-	@GetMapping("/category/add")
+	@GetMapping("/product-info/add")
 	public String addProductInfo(Model model) {
 		// trả về 1 đối tượng Category rỗng cho người dùng điền vào các thông tin trên form(code, name và description)
-		model.addAttribute("modelForm", new Category());
+		model.addAttribute("modelForm", new ProductInfo());
 		// gán title động tương ứng với 3 màn hình add, edit và view(tái sử dụng form vì màn hình add, edit và view giống nhau, chỉ khác nhau title)
-		model.addAttribute("titlePage", "Add Category");
+		model.addAttribute("titlePage", "Add ProductInfo");
 		// màn hình add thì được sửa các thông tin trên form(viewOnly==false)
 		model.addAttribute("viewOnly", false);  
 		
@@ -100,7 +100,7 @@ public class ProductInfoController {
 		List<Category> categories = productService.getAllCategory(null, null);
 		Map<String, String> mapCategory = new HashMap<>();
 		for(Category category : categories) {
-			// ta gán key:id và value:tên của category đó
+			// ta gán key:id của category và value:name của category đó
 			mapCategory.put(String.valueOf(category.getId()), category.getName());
 		}
 		model.addAttribute("mapCategory", mapCategory);
@@ -119,6 +119,11 @@ public class ProductInfoController {
 				// ta gán key:id và value:tên của category đó
 				mapCategory.put(String.valueOf(category.getId()), category.getName());
 			}
+			
+			// khi ta get từ DB ra --> ta chỉ có 1 đối tượng Category thôi(mapping)
+			// ta phải setCateId để bên phía productInfo-action.jsp phần path="cateId" sẽ tự động selecet cho ta cateId mà ta đã chọn
+			productInfo.setCateId(productInfo.getCategory().getId());
+			
 			model.addAttribute("mapCategory", mapCategory);
 			model.addAttribute("titlePage", "Edit ProductInfo");
 			model.addAttribute("modelForm", productInfo);                      // lúc này ta đã có đối tượng productInfo vừa tìm thấy trong DB rồi
@@ -158,11 +163,17 @@ public class ProductInfoController {
 				// ta gán key:id và value:tên của category đó
 				mapCategory.put(String.valueOf(category.getId()), category.getName());
 			}
-			model.addAttribute("mapCategory", mapCategory);
+			model.addAttribute("mapCategory", mapCategory);	
 			model.addAttribute("modelForm", productInfo);
 			model.addAttribute("viewOnly", false);
 			return "productInfo-action";
 		}
+		
+		// khi form submit lên thì chỉ có cateId(cái ta select Category ở trang productInfo-action) thôi, chưa có đối tượng Category
+		// mà category là notnull --> khi save phải setCategory
+		Category category = new Category();
+		category.setId(productInfo.getCateId());  // lấy ra cateId bên phía productInfo-action.jsp để gán lại cho category
+		productInfo.setCategory(category);
 		
 		// vì màn hình add và edit dùng chung 1 form ==> để phân biệt add và edit: nếu là add thì không có id còn
 		// nếu là edit ==> có id đi kèm(vì record đó đã tồn tại trong DB) và id đó khác 0 và khác null 
@@ -182,7 +193,6 @@ public class ProductInfoController {
 				session.setAttribute(Constant.MSG_SUCCESS, "Insert success!!!"); 
 			} catch (Exception e) {
 				e.printStackTrace();
-				log.info(e.getMessage());
 				session.setAttribute(Constant.MSG_ERROR, "Insert has error!!!"); 
 			}
 		}
