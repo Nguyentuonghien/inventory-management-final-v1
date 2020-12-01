@@ -102,19 +102,21 @@ public class ProductService {
 		productInfo.setActiveFlag(1);
 		productInfo.setCreateDate(new Date());
 		productInfo.setUpdateDate(new Date());
-		processUploadFile(productInfo.getMultipartFile());
+		String fileName = System.currentTimeMillis()+"_"+productInfo.getMultipartFile().getOriginalFilename();
+		processUploadFile(productInfo.getMultipartFile(), fileName);
 		// khi ta save ảnh vào DB, ta chỉ lưu đường dẫn tương đối của nó và ta sẽ tạo ra 1 đường dẫn để ảnh lưu vào trong DB
-		productInfo.setImgUrl("/upload/"+System.currentTimeMillis()+"_"+productInfo.getMultipartFile().getOriginalFilename());
+		productInfo.setImgUrl("/upload/"+fileName);
 		productInfoDAO.save(productInfo);
 	}
 	
 	public void updateProductInfo(ProductInfo productInfo) throws Exception{
 		log.info("Update ProductInfo "+productInfo.toString());
-		processUploadFile(productInfo.getMultipartFile());
 		// edit: ta chọn 1 file ảnh khác với file ảnh hiện tại
-		// nếu khác rỗng --> ta đã chọn(thay đổi) 1 ảnh khác rồi --> ta sẽ sửa lại đường dẫn lưu trong DB cho nó
-		if(productInfo.getMultipartFile() != null) {    // 
-			productInfo.setImgUrl("/upload/"+System.currentTimeMillis()+"_"+productInfo.getMultipartFile().getOriginalFilename());
+		// nếu tên file không rỗng --> ta đã chọn(thay đổi) 1 ảnh khác rồi --> ta sẽ sửa lại đường dẫn lưu trong DB cho nó
+		if(!productInfo.getMultipartFile().getOriginalFilename().isEmpty()) {  
+			String fileName = System.currentTimeMillis()+"_"+productInfo.getMultipartFile().getOriginalFilename();
+			processUploadFile(productInfo.getMultipartFile(), fileName);
+			productInfo.setImgUrl("/upload/"+fileName);
 		}
 		productInfo.setUpdateDate(new Date());
 		productInfoDAO.update(productInfo);
@@ -168,18 +170,17 @@ public class ProductService {
 		return productInfoDAO.findById(ProductInfo.class, id);
 	}
 	
-	private void processUploadFile(MultipartFile multipartFile) throws IllegalStateException, IOException {
-		// đã có file được upload lên
-		if(multipartFile != null) {
-			// "upload.location": đường dẫn đến file ta tạo ra bên phía server (/F:/fileupload)
+	private void processUploadFile(MultipartFile multipartFile, String fileName) throws IllegalStateException, IOException {
+		// đã có file được upload lên và tên của file khác rỗng
+		if(!multipartFile.getOriginalFilename().isEmpty()) {
+			// với "upload.location": là đường dẫn đến file ta tạo ra bên phía server (/F:/fileupload)
 			File dir = new File(ConfigLoader.getInstance().getValue("upload.location"));
 			// dir chưa được tạo --> sẽ tạo dir
 			if(!dir.exists()) {
 				dir.mkdirs();
 			}
 			// tránh trường hợp upload file mà tên ảnh trùng nhau(vd tên ảnh: kayn.jpg)
-			// tạo ra 1 file rỗng với tên file= fileName
-			String fileName = System.currentTimeMillis()+"_"+multipartFile.getOriginalFilename();
+			// tạo ra 1 file rỗng với tên=file
 			File file = new File(ConfigLoader.getInstance().getValue("upload.location"), fileName);
 			multipartFile.transferTo(file);
 		}

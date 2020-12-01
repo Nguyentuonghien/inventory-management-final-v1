@@ -53,8 +53,7 @@ public class ProductInfoValidator implements Validator{
 				}
 			}
 		}
-		// kiểm tra các đường dẫn: tên file không rỗng
-		// ta chỉ support các file có đuôi là "jpg" và "png"(kayn.jpg, kayn.png), còn các file khác ta sẽ k support
+		// nếu tên file không rỗng và ta chỉ support các file có đuôi là "jpg" và "png"(tên file: kayn.jpg, kayn.png), còn các file khác ta sẽ k support
 		if(!productInfo.getMultipartFile().getOriginalFilename().isEmpty()) {
 			String extension = FilenameUtils.getExtension(productInfo.getMultipartFile().getOriginalFilename());
 			if(!extension.equals("jpg") && !extension.equals("png")) {
