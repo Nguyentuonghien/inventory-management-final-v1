@@ -32,6 +32,14 @@
 		<put-attribute name="body" value="/WEB-INF/views/product-info/productInfo-list.jsp"></put-attribute>
 	</definition>
     
+    <definition name="productInStock-list" extends="master">
+		<put-attribute name="body" value="/WEB-INF/views/product-in-stock/productInStock-list.jsp"></put-attribute>
+	</definition>
+	
+	<definition name="history-list" extends="master">
+		<put-attribute name="body" value="/WEB-INF/views/history/history.jsp"></put-attribute>
+	</definition>
+    
     <!-- không cần kế thừa từ master -->
     <definition name="access-denied" template="/WEB-INF/views/error-page/access-denied.jsp"></definition>
     
