@@ -1,6 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+
+<style>
+.price {
+   font-size: 14px;
+}
+</style>
 
 <div class="right_col" role="main">
 	<div class="container">
@@ -78,7 +85,7 @@
 										<td class=" ">${productInStock.productInfo.name}</td>
 										<td class=" "><img src='<c:url value="${productInStock.productInfo.imgUrl}"/>' width="100px" height="100px" /></td>
 										<td class=" ">${productInStock.qty}</td>
-										<td class=" ">${productInStock.price}</td>
+										<td class="price">${productInStock.price}</td>
 								</c:forEach>
 							</tbody>
 						</table>
@@ -94,4 +101,38 @@
 	</div>
 </div>
 
+<script type="text/javascript">
+	 function gotoPage(page){
+		 $('#searchForm').attr('action','<c:url value="/product-in-stock/list/"/>'+page);
+		 $('#searchForm').submit();
+	 }
+	 $(document).ready(function(){
+		 processMessage();
+		 $('.price').each(function(){
+			 $(this).text(numeral($(this).text()).format('0,0'));
+		 }) 
+	 });
+	 function processMessage(){
+		 var msgSuccess = '${msgSuccess}';
+		 var msgError = '${msgError}';
+		 if(msgSuccess){
+			 new PNotify({
+                 title: ' Success',
+                 text: msgSuccess,
+                 type: 'success',
+                 styling: 'bootstrap3'
+             });
+		 }
+		 if(msgError){
+			 new PNotify({
+                 title: ' Error',
+                 text: msgError,
+                 type: 'error',
+                 styling: 'bootstrap3'
+             });
+		 }
+	 }
+	
+	
+</script>
 
