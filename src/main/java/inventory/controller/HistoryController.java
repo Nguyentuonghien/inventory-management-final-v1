@@ -1,4 +1,4 @@
-package inventory.controller;
+ package inventory.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,23 +22,23 @@ public class HistoryController {
 	@Autowired
 	private HistoryService historyService;
 	
-	@GetMapping(value = {"/histoty/list", "/history/list/"})
+	@GetMapping({"/history/list","/history/list/"})
 	public String redirect() {
 		return "redirect:/history/list/1";
 	}
 	
 	@GetMapping("/history/list/{page}")
-	public String listHistory(@PathVariable("page") int page, Model model, @ModelAttribute("searchForm") History history) {
+	public String listHistory(Model model, @ModelAttribute("searchForm") History history,@PathVariable("page") int page) {
 		Paging paging = new Paging(5);
 		paging.setIndexPage(page);
 		List<History> histories = historyService.getAllHistory(history, paging);
-		Map<String, Object> mapType = new HashMap<>();
+		Map<String, String> mapType = new HashMap<>();
 		mapType.put(String.valueOf(Constant.TYPE_ALL), "All");
 		mapType.put(String.valueOf(Constant.TYPE_GOODS_RECEIPT), "Goods Receipt");
 		mapType.put(String.valueOf(Constant.TYPE_GOODS_ISSUES), "Goods Issues");
 		model.addAttribute("histories", histories);
 		model.addAttribute("mapType", mapType);
 		model.addAttribute("pageInfo", paging);
-		return "history";
+		return "history-list";
 	}
 }

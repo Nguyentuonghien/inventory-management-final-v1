@@ -27,42 +27,6 @@ public class InvoiceService {
 	@Autowired
 	private InvoiceDAO<Invoice> invoiceDAO;
 	
-	public void save(Invoice invoice) throws Exception {
-		// tạo 1 đtượng ProductInfo và gán id của productInfo trong invoice cho nó 
-		ProductInfo productInfo = new ProductInfo();
-		productInfo.setId(invoice.getProductId());
-		invoice.setProductInfo(productInfo);
-		invoice.setActiveFlag(1);
-		invoice.setCreateDate(new Date());
-		invoice.setUpdateDate(new Date());
-		invoiceDAO.save(invoice);
-		// save vào historyService để lưu lại lịch sử
-		historyService.save(invoice, Constant.ACTION_ADD);
-		// khi ta thêm hàng hóa thì productInStock sẽ cập nhật hàng hóa trong kho(số lượng, giá)
-		productInStockService.saveOrUpdate(invoice);
-	}
-	
-	public void update(Invoice invoice) throws Exception {
-		// lấy ra số lượng hàng hóa ban đầu(gốc) của hóa đơn đang nhập hàng
-		int originQuantity = invoiceDAO.findById(Invoice.class, invoice.getId()).getQty();
-		invoice.setUpdateDate(new Date());
-		
-		Invoice newInvoice = new Invoice();
-		// số lượng cập nhât = sl nhập ở form - sl ban đầu, VD: trên hóa đơn đấy số lượng đang là 10 mà ta sửa lại là = 5 ==> 5-10=-5 ==> giảm 5 
-		newInvoice.setQty(invoice.getQty() - originQuantity);
-		// ta cập nhật số lượng sp, còn thông tin và giá của sp ta giữ nguyên
-		newInvoice.setPrice(invoice.getPrice());
-		newInvoice.setProductInfo(invoice.getProductInfo());
-		invoiceDAO.update(invoice);
-		historyService.save(invoice, Constant.ACTION_EDIT);
-		// cập nhật các hàng hóa có trong kho(voi hóa đơn mới)
-		productInStockService.saveOrUpdate(newInvoice);
-	}
-	
-	public List<Invoice> findInvoioceByProperty(String property, Object value) {
-		return invoiceDAO.findByProperty(property, value);
-	}
-	
 	public List<Invoice> getListInvoice(Invoice invoice, Paging paging) {
 		StringBuilder queryStr = new StringBuilder();
 		Map<String, Object> mapParams = new HashMap<>();
@@ -87,6 +51,45 @@ public class InvoiceService {
 			}
 		}
 		return invoiceDAO.findAll(queryStr.toString(), mapParams, paging);
+	}
+	
+	public void save(Invoice invoice) throws Exception {
+		// tạo 1 đtượng ProductInfo và gán id của productInfo trong invoice cho nó 
+		ProductInfo productInfo = new ProductInfo();
+		productInfo.setId(invoice.getProductId());
+		invoice.setProductInfo(productInfo);
+		invoice.setActiveFlag(1);
+		invoice.setCreateDate(new Date());
+		invoice.setUpdateDate(new Date());
+		invoiceDAO.save(invoice);
+		// save vào historyService để lưu lại lịch sử
+		historyService.save(invoice, Constant.ACTION_ADD);
+		// khi ta thêm hàng hóa thì productInStock sẽ cập nhật hàng hóa trong kho(số lượng, giá)
+		productInStockService.saveOrUpdate(invoice);
+	}
+	
+	public void update(Invoice invoice) throws Exception {
+		// lấy ra số lượng hàng hóa ban đầu(gốc) của hóa đơn đang nhập hàng
+		int originQuantity = invoiceDAO.findById(Invoice.class, invoice.getId()).getQty();
+		ProductInfo productInfo = new ProductInfo();
+		productInfo.setId(invoice.getProductId());
+		invoice.setProductInfo(productInfo);
+		invoice.setUpdateDate(new Date());
+		
+		Invoice newInvoice = new Invoice();
+		// số lượng cập nhât = sl nhập ở form - sl ban đầu, VD: trên hóa đơn đấy số lượng đang là 10 mà ta sửa lại là = 5 ==> 5-10=-5 ==> giảm 5 
+		newInvoice.setQty(invoice.getQty() - originQuantity);
+		// ta cập nhật số lượng sp, còn thông tin và giá của sp ta giữ nguyên
+		newInvoice.setPrice(invoice.getPrice());
+		newInvoice.setProductInfo(invoice.getProductInfo());
+		invoiceDAO.update(invoice);
+		historyService.save(invoice, Constant.ACTION_EDIT);
+		// cập nhật các hàng hóa có trong kho(voi hóa đơn mới)
+		productInStockService.saveOrUpdate(newInvoice);
+	}
+	
+	public List<Invoice> findInvoioceByProperty(String property, Object value) {
+		return invoiceDAO.findByProperty(property, value);
 	}
 	
 }

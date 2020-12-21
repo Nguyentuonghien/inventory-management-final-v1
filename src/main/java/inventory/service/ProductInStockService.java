@@ -59,14 +59,13 @@ public class ProductInStockService {
 	public void saveOrUpdate(Invoice invoice) throws Exception{
 		log.info("product in stock:");
 		
-		// nếu có hóa đơn của sản phẩm(ProductInfo), ta sẽ lấy ra code của sản phẩm đó trong hóa đơn (code không trùng nhau)
-		// sau đó tìm trong kho theo code của sản phẩm đó (kiểm tra trong kho đã có code của ProductInfo chưa?)
 		if(invoice.getProductInfo() != null) {
-			String code = invoice.getProductInfo().getCode();
-			ProductInStock productInStock = productInStockDAO.findByProperty("productInfo.code", code).get(0); // lấy ra pt đầu tiên vì code không trùng nhau
-			// nếu tìm thấy code của ProductInfo trong kho, ta sẽ cập nhật lại số lượng và giá cho ProductInfo trong kho
-			// còn không ta sẽ insert nó
-			if(productInStock != null) {
+			int id = invoice.getProductInfo().getId();
+			List<ProductInStock> productInStocks = productInStockDAO.findByProperty("productInfo.id", id);
+			ProductInStock productInStock = null;
+			// nếu tìm thấy ProductInfo trong kho, ta sẽ cập nhật lại số lượng và giá cho ProductInfo trong kho còn không ta sẽ insert nó
+			if(productInStocks != null && !productInStocks.isEmpty()) {
+				productInStock = productInStocks.get(0);
 				log.info("update quantity = "+invoice.getQty() + "and price = "+invoice.getPrice());
 				// số lượng sp cập nhật = số lượng sp hiện tại có trong kho + số lượng sp trong hóa đơn
 				productInStock.setQty(productInStock.getQty()+invoice.getQty());

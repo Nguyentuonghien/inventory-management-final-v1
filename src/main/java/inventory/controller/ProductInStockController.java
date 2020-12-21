@@ -25,7 +25,7 @@ public class ProductInStockController {
 	}
 	
 	@RequestMapping(value = "/product-in-stock/list/{page}")
-	public String showProductInStockList(Model model, @ModelAttribute("search") ProductInStock productInStock, @PathVariable("page") int page) {
+	public String showProductInStockList(Model model, @ModelAttribute("searchForm") ProductInStock productInStock, @PathVariable("page") int page) {
 		Paging paging = new Paging(5);
 		paging.setIndexPage(page);
 		List<ProductInStock> productInStocks = productInStockService.getAllProductInStock(productInStock , paging);
