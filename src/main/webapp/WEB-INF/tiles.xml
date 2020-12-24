@@ -47,6 +47,14 @@
     <definition name="goods-receipt-action" extends="master">
 		<put-attribute name="body" value="/WEB-INF/views/invoice/goods-receipt-action.jsp"></put-attribute>
 	</definition>
+	
+	<definition name="goods-issue-list" extends="master">
+		<put-attribute name="body" value="/WEB-INF/views/invoice/goods-issue-list.jsp"></put-attribute>
+	</definition>
+    
+    <definition name="goods-issue-action" extends="master">
+		<put-attribute name="body" value="/WEB-INF/views/invoice/goods-issue-action.jsp"></put-attribute>
+	</definition>
     
     <!-- không cần kế thừa từ master -->
     <definition name="access-denied" template="/WEB-INF/views/error-page/access-denied.jsp"></definition>

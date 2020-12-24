@@ -62,7 +62,7 @@ public class InvoiceService {
 		invoice.setCreateDate(new Date());
 		invoice.setUpdateDate(new Date());
 		invoiceDAO.save(invoice);
-		// save vào historyService để lưu lại lịch sử
+		// save vào historyService để lưu lại lịch sử và action tương ứng
 		historyService.save(invoice, Constant.ACTION_ADD);
 		// khi ta thêm hàng hóa thì productInStock sẽ cập nhật hàng hóa trong kho(số lượng, giá)
 		productInStockService.saveOrUpdate(invoice);

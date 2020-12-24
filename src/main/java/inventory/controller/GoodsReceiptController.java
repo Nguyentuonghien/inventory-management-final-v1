@@ -27,7 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 import inventory.model.Invoice;
 import inventory.model.Paging;
 import inventory.model.ProductInfo;
-import inventory.service.GoodsReceiptReport;
+import inventory.service.InvoiceReport;
 import inventory.service.InvoiceService;
 import inventory.service.ProductService;
 import inventory.util.Constant;
@@ -80,7 +80,7 @@ public class GoodsReceiptController  {
 		
 		List<Invoice> invoices = invoiceService.getListInvoice(invoice, paging);
 		
-		// nếu có thông báo(success hoặc error) được lưu trong session thì ta sẽ lấy nó ra và gửi nó qua "category-list" 
+		// nếu có thông báo(success hoặc error) được lưu trong session thì ta sẽ lấy nó ra và gửi nó qua "goods-receipt-list" 
 		// và đồng thời xóa nó luôn trong session
 		if(session.getAttribute(Constant.MSG_SUCCESS) != null) {
 			model.addAttribute(Constant.MSG_SUCCESS, session.getAttribute(Constant.MSG_SUCCESS));
@@ -188,7 +188,7 @@ public class GoodsReceiptController  {
 		// lấy toàn bộ dữ liệu từ goods-recipt ra(không cần phân trang)
 		List<Invoice> invoices = invoiceService.getListInvoice(invoice, null);
 		modelAndView.addObject(Constant.KEY_GOODS_RECEIPT_REPORT, invoices);
-		modelAndView.setView(new GoodsReceiptReport());
+		modelAndView.setView(new InvoiceReport());
 		return modelAndView;
 	}
 	

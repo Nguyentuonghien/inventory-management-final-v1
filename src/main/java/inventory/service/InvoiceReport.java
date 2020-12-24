@@ -15,13 +15,22 @@ import inventory.model.Invoice;
 import inventory.util.Constant;
 import inventory.util.DateUtil;
 
-public class GoodsReceiptReport extends AbstractXlsxView{
+public class InvoiceReport extends AbstractXlsxView{
 
 	@Override
 	protected void buildExcelDocument(Map<String, Object> model, Workbook workbook, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		List<Invoice> invoices =(List<Invoice>) model.get(Constant.KEY_GOODS_RECEIPT_REPORT);
+		String fileName="";
+		if(invoices.get(0).getType() == Constant.TYPE_GOODS_ISSUES) {
+			fileName = "goods-issues-"+System.currentTimeMillis()+".xlsx";
+		}else {
+			fileName = "goods-receipt-"+System.currentTimeMillis()+".xlsx";
+		}
+		
 		//response.setHeader("Content-Disposition", "attachment;filename=\"goods-receipt-export.xlsx\"");
-		String fileName = "invoice-export-"+System.currentTimeMillis()+".xlsx";
+		//String fileName = "invoice-export-"+System.currentTimeMillis()+".xlsx";
+		
 		response.setHeader("Content-Disposition", "attachment;filename=\""+fileName+"\"");
 		
 		Sheet sheet = workbook.createSheet("dataExcel");
@@ -33,7 +42,6 @@ public class GoodsReceiptReport extends AbstractXlsxView{
 		rowHeader.createCell(4).setCellValue("Product");
 		rowHeader.createCell(5).setCellValue("Update Date");
 		
-		List<Invoice> invoices =(List<Invoice>) model.get(Constant.KEY_GOODS_RECEIPT_REPORT);
 		int rowNum=1;
 		for(Invoice invoice :invoices) {
 			Row row = sheet.createRow(rowNum++);
