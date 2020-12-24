@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import inventory.model.History;
 import inventory.model.Paging;
@@ -27,7 +28,7 @@ public class HistoryController {
 		return "redirect:/history/list/1";
 	}
 	
-	@GetMapping("/history/list/{page}")
+	@RequestMapping(value = "/history/list/{page}")
 	public String listHistory(Model model, @ModelAttribute("searchForm") History history,@PathVariable("page") int page) {
 		Paging paging = new Paging(5);
 		paging.setIndexPage(page);

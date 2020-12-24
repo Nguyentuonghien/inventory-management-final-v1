@@ -59,17 +59,24 @@ public class ProductInStockService {
 	public void saveOrUpdate(Invoice invoice) throws Exception{
 		log.info("product in stock:");
 		
+		// Nếu các trường liên quan đến ProductInfo có trong hóa đơn không rỗng --> ta sẽ tìm sản phẩm trong kho(ProductInStock) theo id của nó trong hóa đơn
 		if(invoice.getProductInfo() != null) {
 			int id = invoice.getProductInfo().getId();
 			List<ProductInStock> productInStocks = productInStockDAO.findByProperty("productInfo.id", id);
 			ProductInStock productInStock = null;
-			// nếu tìm thấy ProductInfo trong kho, ta sẽ cập nhật lại số lượng và giá cho ProductInfo trong kho còn không ta sẽ insert nó
+			// nếu tìm thấy ProductInfo trong kho, ta chỉ cần update lại 2 trường là số lượng và giá cho ProductInfo có trong kho 
+			// còn không tìm thấy ProductInfo, ta sẽ insert nó
 			if(productInStocks != null && !productInStocks.isEmpty()) {
 				productInStock = productInStocks.get(0);
 				log.info("update quantity = "+invoice.getQty() + "and price = "+invoice.getPrice());
-				// số lượng sp cập nhật = số lượng sp hiện tại có trong kho + số lượng sp trong hóa đơn
-				productInStock.setQty(productInStock.getQty()+invoice.getQty());
-				// cập nhật giá: ta chỉ cập nhật giá khi nhập hàng(xuất hàng k cần), với type==1 thì là nhập hàng(receipt), type==2 là xuất hàng(issues)
+				if(invoice.getType() == 2) {
+					// xuất hàng: số lượng sp được update = số lượng sp hiện tại có trong kho - số lượng sp trong hóa đơn
+					productInStock.setQty(productInStock.getQty() - invoice.getQty());
+				}else {
+					// nhập hàng: số lượng sp được update = số lượng sp hiện tại có trong kho + số lượng sp trong hóa đơn
+					productInStock.setQty(productInStock.getQty() + invoice.getQty());
+				}
+				// update giá: ta chỉ update giá khi nhập hàng(type=1) còn xuất hàng không cần(type=2)
 				if(invoice.getType() == 1) {
 					productInStock.setPrice(invoice.getPrice());
 				}
@@ -82,9 +89,9 @@ public class ProductInStockService {
 				// thêm mới sp từ hóa đơn vào kho, id là id của sp trong hóa đơn
 				productInfo.setId(invoice.getProductInfo().getId());
 				productInStock.setProductInfo(productInfo);
-				productInStock.setActiveFlag(1);
 				productInStock.setPrice(invoice.getPrice());
 				productInStock.setQty(invoice.getQty());
+				productInStock.setActiveFlag(1);
 				productInStock.setCreateDate(new Date());
 				productInStock.setUpdateDate(new Date());
 				productInStockDAO.save(productInStock);
