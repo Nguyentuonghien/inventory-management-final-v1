@@ -4,6 +4,7 @@ package inventory.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,6 +23,8 @@ public class Menu implements java.io.Serializable {
 	private Set<Auth> auths = new HashSet<Auth>(0);
 	private List<Menu> child;
 	private String idMenu;
+	
+	private Map<Integer,Integer> mapAuth;
 	
 	public Menu() {
 	}
@@ -135,6 +138,14 @@ public class Menu implements java.io.Serializable {
 
 	public void setIdMenu(String idMenu) {
 		this.idMenu = idMenu;
+	}
+
+	public Map<Integer, Integer> getMapAuth() {
+		return mapAuth;
+	}
+
+	public void setMapAuth(Map<Integer, Integer> mapAuth) {
+		this.mapAuth = mapAuth;
 	}
 	
 }
