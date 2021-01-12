@@ -38,8 +38,7 @@ public class LoginController {
 
 	@InitBinder
 	private void initBinder(WebDataBinder dataBinder) { // WebDataBinder: mang dữ liệu từ jsp lên
-		if (dataBinder.getTarget() == null)
-			return;
+		if (dataBinder.getTarget() == null) return;
 		// trong class LoginValidator ta chỉ support Class validate là Users(các class khác thì không)
 		// và binder sẽ kiểm tra nếu đúng là class Users --> sẽ setValidator cho loginValidator
 		if (dataBinder.getTarget().getClass() == Users.class) {

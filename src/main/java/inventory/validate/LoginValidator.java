@@ -11,6 +11,7 @@ import org.springframework.validation.Validator;
 
 import inventory.model.Users;
 import inventory.service.UserService;
+import inventory.util.HashingPassword;
 
 @Component
 public class LoginValidator implements Validator{
@@ -18,10 +19,9 @@ public class LoginValidator implements Validator{
 	@Autowired
 	private UserService userService;
 	
-	// class cần được support(Users)
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return clazz == Users.class;
+		return clazz == Users.class;  // class cần được support(Users)
 	}
 
 	// target: là đối tượng user bao gồm các thông tin được gửi từ form(login) lên bao gồm username và password của user
@@ -31,7 +31,7 @@ public class LoginValidator implements Validator{
 	
 		// kiểm tra xem 2 trường ta điền vào form có rỗng không(username và password), nếu rỗng sẽ báo lỗi
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userName", "message.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "message.required");
+		ValidationUtils.rejectIfEmpty(errors, "password", "message.required");
 		
 		// username và password không rỗng(đã qua bước kiểm tra bên trên)
 		if(!StringUtils.isEmpty(user.getUserName()) && !StringUtils.isEmpty(user.getPassword())) {
@@ -39,10 +39,9 @@ public class LoginValidator implements Validator{
 			
 			// kiểm tra xem username trả về có khác null và khác rỗng không?
 			if(user != null && !users.isEmpty()) {
-				// có username được trả về, lấy ra đối tượng đầu tiên(username không trùng nhau) và ta so sánh password
-				// users.get(0).getPassword() là password ta đã lưu trong DB và ta lấy ra,  user.getPassword() là password ta nhập từ form
-				if(!users.get(0).getPassword().equals(user.getPassword())) {   
-					// password không trùng nhau --> thông báo lỗi
+				// có username được trả về, lấy ra đối tượng đầu tiên(username không trùng nhau)
+				// so sánh password ta nhập trong form(ta cũng sẽ mã hóa password) vs password lưu trong DB, nếu password không trùng nhau ==> thông báo lỗi
+				if(!users.get(0).getPassword().equals(HashingPassword.encript(user.getPassword()))) {   
 					errors.rejectValue("password", "message.wrong.password");
 				}
 			}else {

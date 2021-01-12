@@ -4,7 +4,7 @@
 	<div class="">
 		<div class="page-title">
 			<div class="title_left">
-			    <p>Hello Tran Huyen Trang</p>
+			    <p>Hello Admin</p>
 			</div>
 		</div>
 	</div>
